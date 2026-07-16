@@ -1,5 +1,7 @@
-import { useState, useMemo, useRef, useEffect, type CSSProperties } from 'react'
+import { useState, useMemo, useRef, useEffect, type CSSProperties, type ReactNode } from 'react'
 import titlePageImg from '@/imports/title_page.png'
+import lastPageImg from '@/imports/last_page.png'
+import dinosaurHatchingVideo from '@/imports/Dinosaur hatching.mp4'
 import toothbrushVideo from '@/imports/toothbrush.mp4'
 import iAmABoyVideo from '@/imports/Im_a_boy.mp4'
 import iAmAGirlVideo from '@/imports/im a girl.mp4'
@@ -42,6 +44,25 @@ interface Deco {
 /* ─── Page content ───────────────────────────────────────── */
 
 const PAGES: PageData[] = [
+  {
+    id: 'dinosaur-hatching',
+    title: 'Dinosaur Hatching!',
+    emoji: '🦖',
+    accentColor: '#65A30D',
+    badgeColor: '#F7FEE7',
+    headerGradient: 'linear-gradient(135deg, #84CC16 0%, #4D7C0F 100%)',
+    pageBackground: 'linear-gradient(160deg, #F7FEE7 0%, #ECFCCB 50%, #FEF9C3 100%)',
+    intro:
+      'A baby dinosaur is hiding inside an egg! Let\'s unzip the pouch and help our new dino friend hatch!',
+    steps: [
+      { emoji: '🥚', text: 'Find the dinosaur egg hidden inside the busy book pouch!' },
+      { emoji: '🔓', text: 'Slowly unzip the zipper — listen to the zip-zip sound!' },
+      { emoji: '🦕', text: 'Gently pull the soft dinosaur out of its cozy egg!' },
+      { emoji: '🦖', text: 'Stand your dinosaur up and give it a big friendly roar — RAAWR!' },
+      { emoji: '🎉', text: 'Name your new dinosaur friend and give it a happy hug!' },
+    ],
+    video: dinosaurHatchingVideo,
+  },
   {
     id: 'toothbrush',
     title: 'Brush Your Teeth!',
@@ -173,33 +194,44 @@ const PAGES: PageData[] = [
   },
 ]
 
+const CONFETTI = [
+  { emoji: '⭐', left: '8%',  delay: '0s',   dur: '4.2s', size: '1.4rem' },
+  { emoji: '💖', left: '18%', delay: '0.8s', dur: '5.1s', size: '1.2rem' },
+  { emoji: '🌟', left: '28%', delay: '1.4s', dur: '4.8s', size: '1.6rem' },
+  { emoji: '🎈', left: '42%', delay: '0.3s', dur: '5.5s', size: '1.5rem' },
+  { emoji: '✨', left: '55%', delay: '1.8s', dur: '4.5s', size: '1.3rem' },
+  { emoji: '🦋', left: '68%', delay: '0.6s', dur: '5.8s', size: '1.4rem' },
+  { emoji: '🌈', left: '78%', delay: '2.1s', dur: '4.9s', size: '1.7rem' },
+  { emoji: '💫', left: '88%', delay: '1.1s', dur: '5.3s', size: '1.2rem' },
+  { emoji: '🎉', left: '35%', delay: '2.5s', dur: '4.6s', size: '1.5rem' },
+  { emoji: '🌸', left: '62%', delay: '3s',   dur: '5.0s', size: '1.3rem' },
+]
+
 /* ─── Decoration data ────────────────────────────────────── */
 
 const COVER_DECOS: Deco[] = [
-  { emoji: '⭐', top: '3%',  left: '3%',   size: '2.2rem', anim: 'busyFloat1',   delay: '0s'   },
-  { emoji: '☁️', top: '5%',  left: '22%',  size: '2.8rem', anim: 'busyFloat2',   delay: '0.7s' },
-  { emoji: '🌟', top: '2%',  right: '7%',  size: '2rem',   anim: 'busyFloat1',   delay: '0.4s' },
-  { emoji: '🦋', top: '15%', right: '3%',  size: '2rem',   anim: 'busyDrift',    delay: '0.2s' },
-  { emoji: '✨', top: '32%', left: '2%',   size: '1.6rem', anim: 'busySparkle',  delay: '1s'   },
-  { emoji: '🌈', bottom: '22%', left: '2%',  size: '2.2rem', anim: 'busyFloat2', delay: '0.5s' },
-  { emoji: '💫', bottom: '10%', right: '5%', size: '1.8rem', anim: 'busySparkle',delay: '0.3s' },
-  { emoji: '🌸', top: '55%', right: '2%',  size: '1.7rem', anim: 'busyFloat1',   delay: '1.3s' },
-  { emoji: '🎈', top: '65%', left: '4%',   size: '1.9rem', anim: 'busyFloat2',   delay: '0.8s' },
-  { emoji: '💖', top: '10%', left: '50%',  size: '1.4rem', anim: 'busySparkle',  delay: '0.6s' },
-  { emoji: '🌺', bottom: '5%',  left: '15%', size: '1.7rem', anim: 'busyDrift',  delay: '1.5s' },
-  { emoji: '⭐', bottom: '30%', right: '3%', size: '1.4rem', anim: 'busyFloat1', delay: '1.1s' },
-  { emoji: '🍀', top: '45%', right: '5%',  size: '1.5rem', anim: 'busyDrift',    delay: '0.9s' },
+  { emoji: '⭐', top: '3%',  left: '3%',   size: 'clamp(1.4rem, 4vw, 2.2rem)', anim: 'busyFloat1',   delay: '0s'   },
+  { emoji: '☁️', top: '5%',  left: '22%',  size: 'clamp(1.8rem, 5vw, 2.8rem)', anim: 'busyFloat2',   delay: '0.7s' },
+  { emoji: '🌟', top: '2%',  right: '7%',  size: 'clamp(1.3rem, 3.5vw, 2rem)',   anim: 'busyFloat1',   delay: '0.4s' },
+  { emoji: '🦋', top: '15%', right: '3%',  size: 'clamp(1.3rem, 3.5vw, 2rem)',   anim: 'busyDrift',    delay: '0.2s' },
+  { emoji: '🦖', top: '28%', left: '6%',   size: 'clamp(1.5rem, 4vw, 2.2rem)', anim: 'busyWiggle',   delay: '0.9s' },
+  { emoji: '✨', top: '32%', left: '2%',   size: 'clamp(1.1rem, 3vw, 1.6rem)', anim: 'busySparkle',  delay: '1s'   },
+  { emoji: '🌈', bottom: '22%', left: '2%',  size: 'clamp(1.4rem, 4vw, 2.2rem)', anim: 'busyFloat2', delay: '0.5s' },
+  { emoji: '💫', bottom: '10%', right: '5%', size: 'clamp(1.2rem, 3.5vw, 1.8rem)', anim: 'busySparkle',delay: '0.3s' },
+  { emoji: '🌸', top: '55%', right: '2%',  size: 'clamp(1.2rem, 3.5vw, 1.7rem)', anim: 'busyFloat1',   delay: '1.3s' },
+  { emoji: '🎈', top: '65%', left: '4%',   size: 'clamp(1.3rem, 3.5vw, 1.9rem)', anim: 'busyFloat2',   delay: '0.8s' },
+  { emoji: '💖', top: '10%', left: '50%',  size: 'clamp(1rem, 3vw, 1.4rem)', anim: 'busySparkle',  delay: '0.6s' },
+  { emoji: '🥚', bottom: '5%',  left: '15%', size: 'clamp(1.2rem, 3.5vw, 1.7rem)', anim: 'busyDrift',  delay: '1.5s' },
+  { emoji: '⭐', bottom: '30%', right: '3%', size: 'clamp(1rem, 3vw, 1.4rem)', anim: 'busyFloat1', delay: '1.1s' },
 ]
 
 const BOOK_DECOS: Deco[] = [
-  { emoji: '✨', top: '8%',   right: '1.5%', size: '1.3rem', anim: 'busySparkle', delay: '0s'   },
-  { emoji: '🦋', top: '38%', right: '0.5%', size: '1.4rem', anim: 'busyDrift',   delay: '0.4s' },
-  { emoji: '⭐', bottom: '18%', left: '0.8%', size: '1.2rem', anim: 'busyFloat1', delay: '0.8s' },
-  { emoji: '💫', bottom: '30%', right: '1%',  size: '1.3rem', anim: 'busySparkle',delay: '1.2s' },
-  { emoji: '🌸', top: '65%', left: '1%',    size: '1.2rem', anim: 'busyFloat2',   delay: '0.5s' },
+  { emoji: '✨', top: '8%',   right: '1.5%', size: 'clamp(1rem, 3vw, 1.3rem)', anim: 'busySparkle', delay: '0s'   },
+  { emoji: '🦋', top: '38%', right: '0.5%', size: 'clamp(1rem, 3vw, 1.4rem)', anim: 'busyDrift',   delay: '0.4s' },
+  { emoji: '⭐', bottom: '18%', left: '0.8%', size: 'clamp(0.9rem, 2.5vw, 1.2rem)', anim: 'busyFloat1', delay: '0.8s' },
+  { emoji: '💫', bottom: '30%', right: '1%',  size: 'clamp(0.9rem, 2.5vw, 1.3rem)', anim: 'busySparkle',delay: '1.2s' },
+  { emoji: '🌸', top: '65%', left: '1%',    size: 'clamp(0.9rem, 2.5vw, 1.2rem)', anim: 'busyFloat2',   delay: '0.5s' },
 ]
-
-/* ─── Fixed star positions (avoids Math.random re-renders) ─ */
 
 const STARS = [
   { top: '8%',  left: '12%',  delay: '0.0s', dur: '2.1s' },
@@ -214,14 +246,6 @@ const STARS = [
   { top: '80%', left: '80%',  delay: '1.3s', dur: '1.5s' },
   { top: '88%', left: '8%',   delay: '0.6s', dur: '2.0s' },
   { top: '92%', left: '55%',  delay: '0.8s', dur: '1.8s' },
-  { top: '5%',  left: '30%',  delay: '1.4s', dur: '2.1s' },
-  { top: '18%', left: '52%',  delay: '0.5s', dur: '1.6s' },
-  { top: '28%', left: '78%',  delay: '1.0s', dur: '2.3s' },
-  { top: '42%', left: '42%',  delay: '0.2s', dur: '1.9s' },
-  { top: '58%', left: '95%',  delay: '1.6s', dur: '2.0s' },
-  { top: '75%', left: '22%',  delay: '0.4s', dur: '1.7s' },
-  { top: '85%', left: '68%',  delay: '1.2s', dur: '2.4s' },
-  { top: '97%', left: '40%',  delay: '0.7s', dur: '1.5s' },
 ]
 
 /* ─── Components ─────────────────────────────────────────── */
@@ -265,19 +289,19 @@ function StepBadge({
 
   return (
     <div
-      className="flex items-start gap-3 p-3 rounded-2xl transition-transform hover:scale-[1.02] cursor-default"
-      style={{ background: bg, border: `2.5px solid ${border}` }}
+      className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-default"
+      style={{ background: bg, border: `3px solid ${border}` }}
     >
-      <span className="text-2xl flex-shrink-0 mt-0.5">{step.emoji}</span>
-      <div>
+      <span className="text-3xl sm:text-4xl flex-shrink-0 mt-0.5">{step.emoji}</span>
+      <div className="min-w-0">
         <span
-          className="text-xs font-black uppercase tracking-widest block"
+          className="text-xs sm:text-sm font-black uppercase tracking-widest block"
           style={{ color: accentColor, fontFamily: "'Fredoka One', cursive" }}
         >
           Step {index + 1}
         </span>
         <p
-          className="text-gray-700 font-bold text-sm md:text-base leading-snug mt-0.5"
+          className="text-gray-700 font-bold text-base sm:text-lg leading-snug mt-1"
           style={{ fontFamily: "'Nunito', sans-serif" }}
         >
           {step.text}
@@ -287,9 +311,76 @@ function StepBadge({
   )
 }
 
+function PageDots({
+  current,
+  accentColor,
+  onSelect,
+  disabled,
+}: {
+  current: number
+  accentColor: string
+  onSelect: (index: number) => void
+  disabled: boolean
+}) {
+  return (
+    <div className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto max-w-[42vw] sm:max-w-none px-1 py-1 scrollbar-none">
+      {PAGES.map((p, i) => (
+        <button
+          key={p.id}
+          type="button"
+          aria-label={`Go to page ${i + 1}: ${p.title}`}
+          aria-current={i === current ? 'step' : undefined}
+          disabled={disabled}
+          onClick={() => onSelect(i)}
+          className="rounded-full transition-all duration-300 flex-shrink-0 disabled:cursor-not-allowed"
+          style={{
+            width: i === current ? '32px' : '14px',
+            height: '14px',
+            minWidth: i === current ? '32px' : '14px',
+            background: i === current ? accentColor : '#D1D5DB',
+            boxShadow: i === current ? `0 2px 8px ${accentColor}50` : undefined,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+function KidButton({
+  children,
+  onClick,
+  disabled,
+  gradient,
+  shadow,
+  className = '',
+}: {
+  children: ReactNode
+  onClick: () => void
+  disabled?: boolean
+  gradient: string
+  shadow: string
+  className?: string
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`flex items-center justify-center gap-2 px-5 sm:px-7 py-3.5 sm:py-4 min-h-[52px] rounded-full font-bold text-white text-base sm:text-lg transition-all hover:scale-105 active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 ${className}`}
+      style={{
+        background: gradient,
+        fontFamily: "'Fredoka One', cursive",
+        boxShadow: shadow,
+      }}
+    >
+      {children}
+    </button>
+  )
+}
+
 /* ─── Main App ───────────────────────────────────────────── */
 
-type Screen = 'cover' | 'book'
+type Screen = 'cover' | 'book' | 'finale'
 type FlipState = 'idle' | 'out-left' | 'out-right' | 'in-right' | 'in-left'
 
 export default function App() {
@@ -303,7 +394,6 @@ export default function App() {
     document.title = 'Busy Little Hands Busy Book | Manual'
   }, [])
 
-  /* Cover → Book transition */
   const handleCoverClick = () => {
     if (coverLeaving) return
     setCoverLeaving(true)
@@ -313,9 +403,30 @@ export default function App() {
     }, 680)
   }
 
-  /* Book page navigation */
+  const goToPage = (index: number) => {
+    if (flip !== 'idle' || index === pageIndex) return
+    const dir = index > pageIndex ? 'next' : 'prev'
+    pendingPage.current = index
+    setFlip(dir === 'next' ? 'out-left' : 'out-right')
+    setTimeout(() => {
+      setPageIndex(index)
+      setFlip(dir === 'next' ? 'in-right' : 'in-left')
+    }, 340)
+    setTimeout(() => setFlip('idle'), 700)
+  }
+
   const navigate = (dir: 'next' | 'prev') => {
     if (flip !== 'idle') return
+
+    if (dir === 'next' && pageIndex === PAGES.length - 1) {
+      setFlip('out-left')
+      setTimeout(() => {
+        setScreen('finale')
+        setFlip('idle')
+      }, 340)
+      return
+    }
+
     const next =
       dir === 'next'
         ? Math.min(pageIndex + 1, PAGES.length - 1)
@@ -324,12 +435,10 @@ export default function App() {
 
     pendingPage.current = next
     setFlip(dir === 'next' ? 'out-left' : 'out-right')
-
     setTimeout(() => {
       setPageIndex(next)
       setFlip(dir === 'next' ? 'in-right' : 'in-left')
     }, 340)
-
     setTimeout(() => setFlip('idle'), 700)
   }
 
@@ -339,9 +448,14 @@ export default function App() {
     setFlip('idle')
   }
 
+  const readAgain = () => {
+    setPageIndex(0)
+    setScreen('book')
+    setFlip('idle')
+  }
+
   const page = PAGES[pageIndex]
 
-  /* Page content transition style */
   const pageStyle = useMemo((): CSSProperties => {
     switch (flip) {
       case 'out-left':
@@ -373,7 +487,7 @@ export default function App() {
   if (screen === 'cover') {
     return (
       <div
-        className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden cursor-pointer"
+        className="relative w-full min-h-dvh flex flex-col items-center justify-center overflow-hidden cursor-pointer px-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
         style={{
           background:
             'radial-gradient(ellipse at 50% 35%, #2563EB 0%, #1A3FB0 55%, #0F2877 100%)',
@@ -383,7 +497,6 @@ export default function App() {
         }}
         onClick={handleCoverClick}
       >
-        {/* Twinkling stars */}
         {STARS.map((s, i) => (
           <div
             key={i}
@@ -391,8 +504,8 @@ export default function App() {
             style={{
               top: s.top,
               left: s.left,
-              width: '3px',
-              height: '3px',
+              width: '4px',
+              height: '4px',
               animation: `busyTwinkle ${s.dur} ease-in-out infinite`,
               animationDelay: s.delay,
             }}
@@ -401,14 +514,12 @@ export default function App() {
 
         <FloatingDecos decos={COVER_DECOS} />
 
-        {/* Book cover image */}
         <div
-          className="relative z-20 flex flex-col items-center"
+          className="relative z-20 flex flex-col items-center w-full"
           style={{ animation: 'busyBookFloat 4s ease-in-out infinite' }}
         >
-          {/* Glowing frame */}
           <div
-            className="rounded-3xl p-1.5 shadow-2xl"
+            className="rounded-3xl p-1.5 sm:p-2 shadow-2xl w-full max-w-[min(520px,92vw)]"
             style={{
               background:
                 'linear-gradient(135deg, #FF6B6B 0%, #FFD700 25%, #4ECDC4 50%, #45B7D1 75%, #8B5CF6 100%)',
@@ -416,41 +527,131 @@ export default function App() {
                 '0 0 40px rgba(255,215,0,0.5), 0 0 80px rgba(69,183,209,0.3)',
             }}
           >
-            <div
-              className="rounded-2xl overflow-hidden"
-              style={{ maxWidth: 'min(520px, 88vw)' }}
-            >
+            <div className="rounded-2xl overflow-hidden bg-white">
               <img
                 src={titlePageImg}
                 alt="Busy Little Hands – Busy Book cover"
-                className="block w-full"
-                style={{ display: 'block' }}
+                className="block w-full h-auto"
                 draggable={false}
               />
             </div>
           </div>
         </div>
 
-        {/* Press anywhere prompt */}
         <div
-          className="relative z-20 mt-8 px-7 py-3 rounded-full"
+          className="relative z-20 mt-6 sm:mt-8 px-5 sm:px-8 py-3.5 sm:py-4 rounded-full max-w-[92vw]"
           style={{
             background: 'rgba(255,255,255,0.15)',
             backdropFilter: 'blur(10px)',
-            border: '2.5px solid rgba(255,255,255,0.45)',
+            border: '3px solid rgba(255,255,255,0.45)',
             animation: 'busyPulseGlow 2.2s ease-in-out infinite',
           }}
         >
           <p
-            className="text-white text-lg md:text-2xl font-bold text-center"
+            className="text-white text-base sm:text-xl md:text-2xl font-bold text-center"
             style={{
               fontFamily: "'Fredoka One', cursive",
               textShadow: '0 2px 8px rgba(0,0,0,0.35)',
               letterSpacing: '0.02em',
             }}
           >
-            👆 Press Anywhere to Open the Manual! 📖
+            👆 Tap Anywhere to Open the Manual! 📖
           </p>
+        </div>
+      </div>
+    )
+  }
+
+  /* ── FINALE SCREEN (back cover) ───────────────────────── */
+  if (screen === 'finale') {
+    return (
+      <div
+        className="relative w-full min-h-dvh flex flex-col items-center justify-center overflow-hidden px-3 sm:px-6 py-6"
+        style={{
+          background: 'linear-gradient(160deg, #E0F2FE 0%, #FEF9C3 40%, #FCE7F3 100%)',
+        }}
+      >
+        {CONFETTI.map((c, i) => (
+          <div
+            key={i}
+            className="absolute pointer-events-none select-none"
+            style={{
+              left: c.left,
+              top: '-5%',
+              fontSize: c.size,
+              animation: `busyConfettiFall ${c.dur} linear infinite`,
+              animationDelay: c.delay,
+            }}
+          >
+            {c.emoji}
+          </div>
+        ))}
+
+        <div
+          className="relative z-20 flex flex-col items-center w-full max-w-3xl"
+          style={{ animation: 'busyFinaleIn 0.7s cubic-bezier(0,0,0.2,1) forwards' }}
+        >
+          <div
+            className="mb-4 sm:mb-6 px-5 sm:px-8 py-3 rounded-full text-center"
+            style={{
+              background: 'linear-gradient(135deg, #FF6B6B, #FFD700, #4ECDC4)',
+              animation: 'busyCelebrate 2s ease-in-out infinite',
+            }}
+          >
+            <p
+              className="text-white text-lg sm:text-2xl md:text-3xl font-bold"
+              style={{
+                fontFamily: "'Fredoka One', cursive",
+                textShadow: '0 2px 6px rgba(0,0,0,0.2)',
+              }}
+            >
+              🎉 You Did It! Great Job! 🌟
+            </p>
+          </div>
+
+          <div
+            className="rounded-3xl p-1.5 sm:p-2 shadow-2xl w-full"
+            style={{
+              background:
+                'linear-gradient(135deg, #3B82F6 0%, #60A5FA 25%, #34D399 50%, #FBBF24 75%, #F472B6 100%)',
+              boxShadow: '0 8px 40px rgba(59,130,246,0.25)',
+            }}
+          >
+            <div className="rounded-2xl overflow-hidden bg-[#FFFDF5]">
+              <img
+                src={lastPageImg}
+                alt="Let's Play, Learn and Stay Healthy — thank you page"
+                className="block w-full h-auto"
+                draggable={false}
+              />
+            </div>
+          </div>
+
+          <p
+            className="mt-5 sm:mt-6 text-center text-gray-600 font-bold text-sm sm:text-base max-w-md px-2"
+            style={{ fontFamily: "'Nunito', sans-serif" }}
+          >
+            You finished every activity in the Busy Book! Keep playing, learning, and staying healthy every day!
+          </p>
+
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center gap-3 sm:gap-5 w-full sm:w-auto">
+            <KidButton
+              onClick={readAgain}
+              gradient="linear-gradient(135deg, #10B981, #059669)"
+              shadow="0 4px 14px rgba(16,185,129,0.4)"
+              className="w-full sm:w-auto"
+            >
+              📖 Read Again
+            </KidButton>
+            <KidButton
+              onClick={goHome}
+              gradient="linear-gradient(135deg, #8B5CF6, #6D28D9)"
+              shadow="0 4px 14px rgba(139,92,246,0.4)"
+              className="w-full sm:w-auto"
+            >
+              🏠 Back to Cover
+            </KidButton>
+          </div>
         </div>
       </div>
     )
@@ -459,7 +660,7 @@ export default function App() {
   /* ── BOOK SCREEN ──────────────────────────────────────── */
   return (
     <div
-      className="relative w-full min-h-screen flex flex-col overflow-hidden"
+      className="relative w-full min-h-dvh flex flex-col overflow-hidden"
       style={{
         background: page.pageBackground,
         fontFamily: "'Nunito', sans-serif",
@@ -467,7 +668,6 @@ export default function App() {
     >
       <FloatingDecos decos={BOOK_DECOS} />
 
-      {/* ── Header ── */}
       <header
         className="relative z-20 shrink-0 overflow-hidden"
         style={{
@@ -475,92 +675,87 @@ export default function App() {
           boxShadow: '0 6px 28px rgba(255, 107, 107, 0.45)',
         }}
       >
-        {/* Floating header decorations */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <span className="absolute text-2xl" style={{ top: '10%', left: '8%', animation: 'busySparkle 2.5s ease-in-out infinite', animationDelay: '0s', opacity: 0.5 }}>⭐</span>
-          <span className="absolute text-xl" style={{ top: '15%', right: '12%', animation: 'busyFloat1 3s ease-in-out infinite', animationDelay: '0.3s', opacity: 0.4 }}>🌈</span>
-          <span className="absolute text-lg" style={{ bottom: '10%', left: '25%', animation: 'busySparkle 2s ease-in-out infinite', animationDelay: '0.7s', opacity: 0.4 }}>✨</span>
-          <span className="absolute text-xl" style={{ bottom: '8%', right: '30%', animation: 'busyFloat2 2.8s ease-in-out infinite', animationDelay: '1s', opacity: 0.4 }}>🦋</span>
+          <span className="absolute text-xl sm:text-2xl" style={{ top: '10%', left: '8%', animation: 'busySparkle 2.5s ease-in-out infinite', opacity: 0.5 }}>⭐</span>
+          <span className="absolute text-lg sm:text-xl" style={{ top: '15%', right: '12%', animation: 'busyFloat1 3s ease-in-out infinite', animationDelay: '0.3s', opacity: 0.4 }}>🌈</span>
+          <span className="absolute text-base sm:text-lg" style={{ bottom: '10%', left: '25%', animation: 'busySparkle 2s ease-in-out infinite', animationDelay: '0.7s', opacity: 0.4 }}>✨</span>
         </div>
 
-        <div className="relative flex items-center justify-between px-4 py-2">
+        <div className="relative flex items-center justify-between gap-2 px-3 sm:px-5 py-2.5 sm:py-3">
           <button
+            type="button"
             onClick={goHome}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full font-bold text-white text-sm md:text-base transition-transform hover:scale-110 active:scale-90"
+            aria-label="Go home"
+            className="flex items-center gap-1 px-3 sm:px-4 py-2.5 min-h-[44px] rounded-full font-bold text-white text-sm sm:text-base transition-transform hover:scale-110 active:scale-90 flex-shrink-0"
             style={{
               background: 'rgba(255,255,255,0.28)',
               border: '2.5px solid rgba(255,255,255,0.6)',
               fontFamily: "'Fredoka One', cursive",
               backdropFilter: 'blur(6px)',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
             }}
           >
-            🏠 Home
+            <span className="text-lg">🏠</span>
+            <span className="hidden sm:inline">Home</span>
           </button>
 
-          <div className="flex flex-col items-center">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl md:text-3xl" style={{ animation: 'busyBounce 1.5s ease-in-out infinite' }}>📚</span>
+          <div className="flex flex-col items-center min-w-0 flex-1 px-1">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="text-xl sm:text-3xl flex-shrink-0" style={{ animation: 'busyBounce 1.5s ease-in-out infinite' }}>📚</span>
               <h1
-                className="text-white text-xl md:text-3xl font-bold"
+                className="text-white text-base sm:text-2xl md:text-3xl font-bold truncate"
                 style={{
                   fontFamily: "'Fredoka One', cursive",
-                  textShadow: '0 3px 8px rgba(0,0,0,0.25), 0 0 20px rgba(255,255,255,0.3)',
-                  letterSpacing: '0.03em',
+                  textShadow: '0 3px 8px rgba(0,0,0,0.25)',
                 }}
               >
                 Busy Little Hands!
               </h1>
-              <span className="text-2xl md:text-3xl" style={{ animation: 'busyBounce 1.5s ease-in-out infinite', animationDelay: '0.3s' }}>🖐️</span>
+              <span className="text-xl sm:text-3xl flex-shrink-0 hidden sm:inline" style={{ animation: 'busyBounce 1.5s ease-in-out infinite', animationDelay: '0.3s' }}>🖐️</span>
             </div>
             <p
-              className="text-white/90 text-xs md:text-sm font-bold tracking-wide"
-              style={{ fontFamily: "'Nunito', sans-serif", textShadow: '0 1px 4px rgba(0,0,0,0.15)' }}
+              className="text-white/90 text-[10px] sm:text-sm font-bold tracking-wide hidden sm:block"
+              style={{ textShadow: '0 1px 4px rgba(0,0,0,0.15)' }}
             >
               🌟 Let's Learn Together! 🌟
             </p>
           </div>
 
           <div
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full font-bold text-white text-sm md:text-base"
+            className="flex items-center gap-1 px-3 sm:px-4 py-2.5 min-h-[44px] rounded-full font-bold text-white text-sm sm:text-base flex-shrink-0"
             style={{
               background: 'rgba(255,255,255,0.28)',
               border: '2.5px solid rgba(255,255,255,0.6)',
               fontFamily: "'Fredoka One', cursive",
               backdropFilter: 'blur(6px)',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
             }}
           >
-            📖 {pageIndex + 1} / {PAGES.length}
+            📖 {pageIndex + 1}/{PAGES.length}
           </div>
         </div>
       </header>
 
-      {/* ── Page content ── */}
-      <main className="relative z-10 flex-1 flex flex-col items-center px-3 py-4 md:px-5 md:py-5 overflow-auto">
+      <main className="relative z-10 flex-1 flex flex-col items-center px-3 sm:px-5 py-3 sm:py-5 overflow-auto">
         <div className="w-full max-w-6xl" style={pageStyle}>
-          {/* Page card */}
           <div
-            className="w-full rounded-3xl overflow-hidden shadow-2xl"
+            className="w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl"
             style={{
               background: 'white',
               border: `4px solid ${page.accentColor}`,
             }}
           >
-            {/* Page header strip */}
             <div
-              className="px-5 py-4 flex items-center gap-3"
+              className="px-4 sm:px-5 py-3.5 sm:py-4 flex items-center gap-3"
               style={{ background: page.headerGradient }}
             >
               <span
-                className="text-4xl md:text-5xl"
+                className="text-3xl sm:text-5xl flex-shrink-0"
                 style={{ animation: 'busyBounce 2s ease-in-out infinite' }}
               >
                 {page.emoji}
               </span>
-              <div>
+              <div className="min-w-0">
                 <h2
-                  className="text-white text-2xl md:text-3xl font-bold leading-tight"
+                  className="text-white text-xl sm:text-2xl md:text-3xl font-bold leading-tight"
                   style={{
                     fontFamily: "'Fredoka One', cursive",
                     textShadow: '0 2px 6px rgba(0,0,0,0.2)',
@@ -568,40 +763,38 @@ export default function App() {
                 >
                   {page.title}
                 </h2>
-                <p className="text-white/80 text-sm font-semibold mt-0.5">
+                <p className="text-white/85 text-xs sm:text-sm font-semibold mt-0.5">
                   Watch the video and follow the steps!
                 </p>
               </div>
             </div>
 
-            {/* Two-column body */}
-            <div className="flex flex-col md:flex-row">
-              {/* Left — video */}
+            <div className="flex flex-col lg:flex-row">
               <div
-                className="md:w-1/2 p-4 md:p-6 flex flex-col items-center gap-3"
+                className="lg:w-1/2 p-3 sm:p-5 md:p-6 flex flex-col items-center gap-3"
                 style={{ background: page.badgeColor }}
               >
-                {/* Rainbow animated video frame */}
                 <div
-                  className="w-full rounded-2xl overflow-hidden shadow-xl"
+                  className="w-full rounded-xl sm:rounded-2xl overflow-hidden shadow-xl"
                   style={{
                     border: `5px solid ${page.accentColor}`,
                     animation: 'busyRainbow 4s linear infinite',
                   }}
                 >
                   <video
+                    key={page.id}
                     src={page.video}
                     autoPlay
                     loop
                     muted
                     playsInline
-                    className="block w-full"
+                    className="block w-full max-h-[40vh] sm:max-h-[50vh] lg:max-h-none"
                     style={{ objectFit: 'contain', background: '#000' }}
                   />
                 </div>
 
                 <div
-                  className="flex items-center gap-2 px-5 py-2 rounded-full font-bold text-white text-sm"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-white text-sm sm:text-base"
                   style={{
                     background: page.accentColor,
                     fontFamily: "'Fredoka One', cursive",
@@ -612,23 +805,20 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Right — instructions */}
-              <div className="md:w-1/2 p-4 md:p-6 flex flex-col gap-3">
-                {/* Intro */}
+              <div className="lg:w-1/2 p-3 sm:p-5 md:p-6 flex flex-col gap-3">
                 <div
-                  className="rounded-2xl px-4 py-3"
+                  className="rounded-xl sm:rounded-2xl px-4 py-3.5"
                   style={{ background: page.badgeColor, border: `2px solid ${page.accentColor}30` }}
                 >
                   <p
-                    className="text-gray-700 text-base md:text-lg font-bold leading-snug"
+                    className="text-gray-700 text-base sm:text-lg font-bold leading-relaxed"
                     style={{ fontFamily: "'Nunito', sans-serif" }}
                   >
                     {page.intro}
                   </p>
                 </div>
 
-                {/* Steps */}
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-2.5 sm:gap-3">
                   {page.steps.map((step, i) => (
                     <StepBadge
                       key={i}
@@ -644,57 +834,49 @@ export default function App() {
         </div>
       </main>
 
-      {/* ── Navigation footer ── */}
       <footer
-        className="relative z-20 flex items-center justify-center gap-4 px-4 py-4 shrink-0"
+        className="relative z-20 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-3 sm:px-5 py-3 sm:py-4 shrink-0"
         style={{
-          background: 'rgba(255,255,255,0.9)',
+          background: 'rgba(255,255,255,0.92)',
           backdropFilter: 'blur(10px)',
           borderTop: '3px solid #FFD700',
+          paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))',
         }}
       >
-        {/* Prev */}
-        <button
-          onClick={() => navigate('prev')}
-          disabled={pageIndex === 0 || flip !== 'idle'}
-          className="flex items-center gap-2 px-5 py-3 rounded-full font-bold text-white text-base md:text-lg transition-all hover:scale-105 active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
-          style={{
-            background: 'linear-gradient(135deg, #8B5CF6, #6D28D9)',
-            fontFamily: "'Fredoka One', cursive",
-            boxShadow: '0 4px 14px rgba(139,92,246,0.4)',
-          }}
-        >
-          ◀ Prev
-        </button>
+        <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto justify-center">
+          <KidButton
+            onClick={() => navigate('prev')}
+            disabled={pageIndex === 0 || flip !== 'idle'}
+            gradient="linear-gradient(135deg, #8B5CF6, #6D28D9)"
+            shadow="0 4px 14px rgba(139,92,246,0.4)"
+          >
+            ◀ Prev
+          </KidButton>
 
-        {/* Dot indicators */}
-        <div className="flex items-center gap-2">
-          {PAGES.map((_, i) => (
-            <div
-              key={i}
-              className="rounded-full transition-all duration-300"
-              style={{
-                width: i === pageIndex ? '28px' : '12px',
-                height: '12px',
-                background: i === pageIndex ? page.accentColor : '#D1D5DB',
-              }}
-            />
-          ))}
+          <PageDots
+            current={pageIndex}
+            accentColor={page.accentColor}
+            onSelect={goToPage}
+            disabled={flip !== 'idle'}
+          />
+
+          <KidButton
+            onClick={() => navigate('next')}
+            disabled={flip !== 'idle'}
+            gradient={
+              pageIndex === PAGES.length - 1
+                ? 'linear-gradient(135deg, #F59E0B, #D97706)'
+                : 'linear-gradient(135deg, #10B981, #059669)'
+            }
+            shadow={
+              pageIndex === PAGES.length - 1
+                ? '0 4px 14px rgba(245,158,11,0.4)'
+                : '0 4px 14px rgba(16,185,129,0.4)'
+            }
+          >
+            {pageIndex === PAGES.length - 1 ? 'Finish 🎉' : 'Next ▶'}
+          </KidButton>
         </div>
-
-        {/* Next */}
-        <button
-          onClick={() => navigate('next')}
-          disabled={pageIndex === PAGES.length - 1 || flip !== 'idle'}
-          className="flex items-center gap-2 px-5 py-3 rounded-full font-bold text-white text-base md:text-lg transition-all hover:scale-105 active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
-          style={{
-            background: 'linear-gradient(135deg, #10B981, #059669)',
-            fontFamily: "'Fredoka One', cursive",
-            boxShadow: '0 4px 14px rgba(16,185,129,0.4)',
-          }}
-        >
-          Next ▶
-        </button>
       </footer>
     </div>
   )
