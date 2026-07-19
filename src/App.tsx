@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect, type CSSProperties, type ReactNode } from 'react'
+import { useState, useMemo, useRef, useEffect, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import titlePageImg from '@/imports/title_page.png'
 import lastPageImg from '@/imports/last_page.png'
 import author1Img from '@/imports/author1.jpg'
@@ -462,15 +462,11 @@ function InfoFabButton({
   )
 }
 
-function InfoButtons({ onOpen, aboveFooter = false }: { onOpen: (panel: InfoPanel) => void; aboveFooter?: boolean }) {
+function InfoButtons({ onOpen }: { onOpen: (panel: InfoPanel) => void }) {
   return (
     <div
       className="fixed z-40 flex flex-col items-end gap-2 sm:gap-2.5 right-3 sm:right-5 pointer-events-none"
-      style={{
-        bottom: aboveFooter
-          ? 'calc(max(0.75rem, env(safe-area-inset-bottom)) + 5.5rem)'
-          : 'max(1rem, env(safe-area-inset-bottom))',
-      }}
+      style={{ bottom: 'max(1rem, env(safe-area-inset-bottom))' }}
     >
       <div className="pointer-events-auto flex flex-col items-end gap-2 sm:gap-2.5">
         <InfoFabButton
@@ -705,6 +701,68 @@ function InfoPanels({ panel, onClose }: { panel: InfoPanel; onClose: () => void 
   )
 }
 
+const BOOK_FOOTER_HEIGHT = 'calc(5.75rem + max(0.75rem, env(safe-area-inset-bottom)))'
+
+function ScrollHint({
+  scrollRef,
+  accentColor,
+  pageKey,
+}: {
+  scrollRef: RefObject<HTMLElement | null>
+  accentColor: string
+  pageKey: string
+}) {
+  const [show, setShow] = useState(false)
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+
+    const update = () => {
+      const canScroll = el.scrollHeight > el.clientHeight + 12
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 20
+      setShow(canScroll && !atBottom)
+    }
+
+    update()
+    el.addEventListener('scroll', update, { passive: true })
+    const observer = new ResizeObserver(update)
+    observer.observe(el)
+
+    return () => {
+      el.removeEventListener('scroll', update)
+      observer.disconnect()
+    }
+  }, [scrollRef, pageKey])
+
+  if (!show) return null
+
+  return (
+    <div
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center"
+      aria-hidden="true"
+    >
+      <div
+        className="w-full h-20"
+        style={{
+          background: 'linear-gradient(to top, rgba(255,255,255,0.95) 35%, transparent 100%)',
+        }}
+      />
+      <div
+        className="flex items-center gap-1.5 px-4 py-2 rounded-full font-bold text-white text-xs sm:text-sm -mt-10 shadow-lg"
+        style={{
+          background: accentColor,
+          fontFamily: "'Fredoka One', cursive",
+          animation: 'busyBounce 1.5s ease-in-out infinite',
+        }}
+      >
+        <span>↓</span>
+        <span>Scroll for more</span>
+      </div>
+    </div>
+  )
+}
+
 /* ─── Main App ───────────────────────────────────────────── */
 
 type Screen = 'cover' | 'book' | 'finale'
@@ -716,14 +774,20 @@ export default function App() {
   const [pageIndex, setPageIndex] = useState(0)
   const [flip, setFlip] = useState<FlipState>('idle')
   const [infoPanel, setInfoPanel] = useState<InfoPanel>(null)
+  const mainScrollRef = useRef<HTMLElement>(null)
   const pendingPage = useRef(0)
 
   useEffect(() => {
     document.title = 'Busy Little Hands Busy Book | Manual'
   }, [])
 
+  useEffect(() => {
+    mainScrollRef.current?.scrollTo({ top: 0, behavior: 'instant' in document.documentElement.style ? 'instant' : 'auto' })
+  }, [pageIndex, screen])
+
   const handleCoverClick = () => {
     if (coverLeaving) return
+    setInfoPanel(null)
     setCoverLeaving(true)
     setTimeout(() => {
       setScreen('book')
@@ -771,6 +835,7 @@ export default function App() {
   }
 
   const goHome = () => {
+    setInfoPanel(null)
     setScreen('cover')
     setPageIndex(0)
     setFlip('idle')
@@ -984,9 +1049,6 @@ export default function App() {
             </KidButton>
           </div>
         </div>
-
-        <InfoButtons onOpen={setInfoPanel} />
-        <InfoPanels panel={infoPanel} onClose={() => setInfoPanel(null)} />
       </div>
     )
   }
@@ -994,7 +1056,7 @@ export default function App() {
   /* ── BOOK SCREEN ──────────────────────────────────────── */
   return (
     <div
-      className="relative w-full min-h-dvh flex flex-col overflow-hidden"
+      className="relative w-full h-dvh flex flex-col overflow-hidden"
       style={{
         background: page.pageBackground,
         fontFamily: "'Nunito', sans-serif",
@@ -1068,8 +1130,13 @@ export default function App() {
         </div>
       </header>
 
-      <main className="relative z-10 flex-1 flex flex-col items-center px-3 sm:px-5 py-3 sm:py-5 overflow-auto">
-        <div className="w-full max-w-6xl" style={pageStyle}>
+      <div className="relative flex-1 min-h-0">
+        <main
+          ref={mainScrollRef}
+          className="relative z-10 h-full overflow-y-auto overflow-x-hidden px-3 sm:px-5 py-3 sm:py-5"
+          style={{ paddingBottom: BOOK_FOOTER_HEIGHT }}
+        >
+          <div className="w-full max-w-6xl mx-auto" style={pageStyle}>
           <div
             className="w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl"
             style={{
@@ -1165,11 +1232,18 @@ export default function App() {
               </div>
             </div>
           </div>
-        </div>
-      </main>
+          </div>
+        </main>
+
+        <ScrollHint
+          scrollRef={mainScrollRef}
+          accentColor={page.accentColor}
+          pageKey={page.id}
+        />
+      </div>
 
       <footer
-        className="relative z-20 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-3 sm:px-5 py-3 sm:py-4 shrink-0"
+        className="fixed bottom-0 left-0 right-0 z-30 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-3 sm:px-5 py-3 sm:py-4"
         style={{
           background: 'rgba(255,255,255,0.92)',
           backdropFilter: 'blur(10px)',
@@ -1212,9 +1286,6 @@ export default function App() {
           </KidButton>
         </div>
       </footer>
-
-      <InfoButtons onOpen={setInfoPanel} aboveFooter />
-      <InfoPanels panel={infoPanel} onClose={() => setInfoPanel(null)} />
     </div>
   )
 }
