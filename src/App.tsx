@@ -1,6 +1,9 @@
 import { useState, useMemo, useRef, useEffect, type CSSProperties, type ReactNode } from 'react'
 import titlePageImg from '@/imports/title_page.png'
 import lastPageImg from '@/imports/last_page.png'
+import author1Img from '@/imports/author1.jpg'
+import author2Img from '@/imports/author2.jpg'
+import busyHandsVideo from '@/imports/busy hands.mp4'
 import dinosaurHatchingVideo from '@/imports/Dinosaur hatching.mp4'
 import toothbrushVideo from '@/imports/toothbrush.mp4'
 import iAmABoyVideo from '@/imports/Im_a_boy.mp4'
@@ -44,6 +47,25 @@ interface Deco {
 /* ─── Page content ───────────────────────────────────────── */
 
 const PAGES: PageData[] = [
+  {
+    id: 'busy-hands',
+    title: 'Busy Hands!',
+    emoji: '🖐️',
+    accentColor: '#DC2626',
+    badgeColor: '#FEF2F2',
+    headerGradient: 'linear-gradient(135deg, #EF4444 0%, #B91C1C 100%)',
+    pageBackground: 'linear-gradient(160deg, #FEF2F2 0%, #FEE2E2 50%, #FFFBEB 100%)',
+    intro:
+      'Let\'s get our hands busy! Practice lacing, zipping, buckling, and fastening — just like getting ready for the day!',
+    steps: [
+      { emoji: '👟', text: 'Find the Busy Hands page with the red sneakers, yellow zipper, green buckle, and white Velcro strip!' },
+      { emoji: '🎀', text: 'Thread the white lace through the holes on the sneakers — try a criss-cross pattern!' },
+      { emoji: '🔒', text: 'Grip the yellow zipper tab and slide it smoothly up and down!' },
+      { emoji: '🔗', text: 'Push the black buckle together until it clicks — then squeeze the sides to release!' },
+      { emoji: '✨', text: 'Peel and press the white Velcro strip — feel the texture and celebrate your busy hands!' },
+    ],
+    video: busyHandsVideo,
+  },
   {
     id: 'dinosaur-hatching',
     title: 'Dinosaur Hatching!',
@@ -378,6 +400,311 @@ function KidButton({
   )
 }
 
+type InfoPanel = 'authors' | 'why-matters' | null
+type AudienceTab = 'children' | 'parents' | 'educators'
+
+const WHY_BOOK_MATTERS: {
+  id: AudienceTab
+  label: string
+  emoji: string
+  gradient: string
+  text: string
+}[] = [
+  {
+    id: 'children',
+    label: 'For the Children',
+    emoji: '🧒',
+    gradient: 'linear-gradient(135deg, #F59E0B, #D97706)',
+    text: 'This book is a playground for growth! It stimulates imagination, enhances fine motor skills, and hand-eye coordination through tactile manipulation (buttoning, zipping, matching, and tracing). It also promotes cognitive development, problem-solving, and foundational literacy and numeracy, turning early learning into a joyful, independent experience.',
+  },
+  {
+    id: 'parents',
+    label: 'For Parents & Guardians',
+    emoji: '👨‍👩‍👧',
+    gradient: 'linear-gradient(135deg, #EC4899, #BE185D)',
+    text: '"Busy Little Hands" is your go-to partner for screen-free engagement. It is a portable, quiet, and meaningful way to keep your child productively occupied at home or on the go. More than that, it provides a beautiful opportunity for interactive bonding and shared milestones as you guide your child through new challenges.',
+  },
+  {
+    id: 'educators',
+    label: 'For Educators',
+    emoji: '👩‍🏫',
+    gradient: 'linear-gradient(135deg, #3B82F6, #1D4ED8)',
+    text: 'This book serves as a valuable, versatile classroom resource. It aligns seamlessly with student-centered, play-based learning and Developmentally Appropriate Practices (DAP). It can be integrated into independent learning centers, used for individualized instruction, or utilized as a creative tool to assess a child\'s fine motor and cognitive readiness.',
+  },
+]
+
+function InfoFabButton({
+  children,
+  onClick,
+  gradient,
+}: {
+  children: ReactNode
+  onClick: () => void
+  gradient: string
+}) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation()
+        onClick()
+      }}
+      className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl font-bold text-white text-xs sm:text-sm transition-all hover:scale-[1.03] active:scale-95 shadow-lg text-left max-w-[200px] sm:max-w-[220px]"
+      style={{
+        background: gradient,
+        fontFamily: "'Fredoka One', cursive",
+        boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+        backdropFilter: 'blur(6px)',
+      }}
+    >
+      {children}
+    </button>
+  )
+}
+
+function InfoButtons({ onOpen, aboveFooter = false }: { onOpen: (panel: InfoPanel) => void; aboveFooter?: boolean }) {
+  return (
+    <div
+      className="fixed z-40 flex flex-col items-end gap-2 sm:gap-2.5 right-3 sm:right-5 pointer-events-none"
+      style={{
+        bottom: aboveFooter
+          ? 'calc(max(0.75rem, env(safe-area-inset-bottom)) + 5.5rem)'
+          : 'max(1rem, env(safe-area-inset-bottom))',
+      }}
+    >
+      <div className="pointer-events-auto flex flex-col items-end gap-2 sm:gap-2.5">
+        <InfoFabButton
+          onClick={() => onOpen('authors')}
+          gradient="linear-gradient(135deg, #8B5CF6, #6D28D9)"
+        >
+          <span className="text-base sm:text-lg flex-shrink-0">💌</span>
+          <span>A Note from the Authors</span>
+        </InfoFabButton>
+        <InfoFabButton
+          onClick={() => onOpen('why-matters')}
+          gradient="linear-gradient(135deg, #F59E0B, #D97706)"
+        >
+          <span className="text-base sm:text-lg flex-shrink-0">📖</span>
+          <span>Why this book matters</span>
+        </InfoFabButton>
+      </div>
+    </div>
+  )
+}
+
+function InfoModal({
+  title,
+  emoji,
+  onClose,
+  children,
+  headerGradient,
+}: {
+  title: string
+  emoji: string
+  onClose: () => void
+  children: ReactNode
+  headerGradient: string
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-6"
+      style={{ background: 'rgba(15, 40, 119, 0.55)', backdropFilter: 'blur(6px)' }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-2xl max-h-[88dvh] overflow-hidden rounded-3xl shadow-2xl flex flex-col"
+        style={{ background: '#FFFBEB', border: '4px solid #FFD700' }}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="info-modal-title"
+      >
+        <div
+          className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3.5 sm:py-4 shrink-0"
+          style={{ background: headerGradient }}
+        >
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <span className="text-2xl sm:text-3xl flex-shrink-0">{emoji}</span>
+            <h2
+              id="info-modal-title"
+              className="text-white text-lg sm:text-2xl font-bold truncate"
+              style={{ fontFamily: "'Fredoka One', cursive", textShadow: '0 2px 6px rgba(0,0,0,0.2)' }}
+            >
+              {title}
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white text-xl font-bold transition-transform hover:scale-110 active:scale-90"
+            style={{ background: 'rgba(255,255,255,0.25)', border: '2px solid rgba(255,255,255,0.5)' }}
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="overflow-y-auto flex-1 p-4 sm:p-6">{children}</div>
+      </div>
+    </div>
+  )
+}
+
+function AuthorsNoteContent() {
+  const paragraphs = [
+    'Dear Parents, Guardians, and Educators,',
+    'Welcome to "Busy Little Hands"!',
+    'As third-year students of the Bachelor of Early Childhood Education (BECEd) program, our passion lies in understanding how young minds grow, play, and learn. We designed this busy book not just as a collection of activities, but as an interactive tool crafted intentionally to support early childhood development through meaningful, hands-on experiences.',
+    'We believe that learning should be an adventure—one where little fingers can explore, experiment, and succeed at their own pace.',
+    'Thank you for allowing us to be a part of your child\'s early learning journey. We hope "Busy Little Hands" sparks curiosity, fosters resilience, and brings endless moments of discovery to your home or classroom!',
+    'With love and dedication to early learning,',
+    'Suzette Merca & Shan Chai Fuentes',
+    'Authors & Future Early Childhood Educators',
+  ]
+
+  return (
+    <div className="flex flex-col items-center gap-5 sm:gap-6">
+      <div className="flex items-center justify-center gap-4 sm:gap-6 w-full">
+        {[
+          { src: author1Img, name: 'Suzette Merca' },
+          { src: author2Img, name: 'Shan Chai Fuentes' },
+        ].map((author) => (
+          <figure key={author.name} className="flex flex-col items-center gap-2 flex-1 max-w-[160px]">
+            <div
+              className="w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-lg"
+              style={{ border: '4px solid #8B5CF6' }}
+            >
+              <img
+                src={author.src}
+                alt={author.name}
+                className="w-full h-full object-cover object-top"
+                draggable={false}
+              />
+            </div>
+            <figcaption
+              className="text-center text-sm sm:text-base font-bold text-gray-700"
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+            >
+              {author.name}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+
+      <div
+        className="w-full rounded-2xl px-4 sm:px-6 py-4 sm:py-5 space-y-3 sm:space-y-4"
+        style={{ background: '#F5F3FF', border: '3px solid #C4B5FD' }}
+      >
+        {paragraphs.map((text, i) => (
+          <p
+            key={i}
+            className={`text-gray-700 leading-relaxed ${
+              i === paragraphs.length - 1 || i === paragraphs.length - 2
+                ? 'font-bold text-base sm:text-lg text-purple-800'
+                : i === 0 || i === 1
+                  ? 'font-bold text-base sm:text-lg text-purple-900'
+                  : 'font-semibold text-sm sm:text-base'
+            }`}
+            style={{ fontFamily: "'Nunito', sans-serif" }}
+          >
+            {text}
+          </p>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function WhyBookMattersContent() {
+  const [tab, setTab] = useState<AudienceTab>('children')
+  const active = WHY_BOOK_MATTERS.find((a) => a.id === tab)!
+
+  return (
+    <div className="flex flex-col gap-4 sm:gap-5">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-2.5">
+        {WHY_BOOK_MATTERS.map((audience) => (
+          <button
+            key={audience.id}
+            type="button"
+            onClick={() => setTab(audience.id)}
+            className="flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-3 sm:py-3.5 rounded-2xl font-bold text-xs sm:text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+            style={{
+              background: tab === audience.id ? audience.gradient : '#F3F4F6',
+              color: tab === audience.id ? 'white' : '#4B5563',
+              fontFamily: "'Fredoka One', cursive",
+              boxShadow: tab === audience.id ? '0 4px 14px rgba(0,0,0,0.15)' : undefined,
+              border: tab === audience.id ? 'none' : '2px solid #E5E7EB',
+            }}
+          >
+            <span className="text-lg sm:text-xl">{audience.emoji}</span>
+            <span className="leading-tight text-center">{audience.label}</span>
+          </button>
+        ))}
+      </div>
+
+      <div
+        className="rounded-2xl px-4 sm:px-6 py-4 sm:py-5 transition-all"
+        style={{
+          background: 'white',
+          border: `3px solid ${tab === 'children' ? '#FCD34D' : tab === 'parents' ? '#F9A8D4' : '#93C5FD'}`,
+        }}
+      >
+        <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <span className="text-3xl sm:text-4xl">{active.emoji}</span>
+          <h3
+            className="text-lg sm:text-xl font-bold text-gray-800"
+            style={{ fontFamily: "'Fredoka One', cursive" }}
+          >
+            {active.label}
+          </h3>
+        </div>
+        <p
+          className="text-gray-700 text-sm sm:text-base font-semibold leading-relaxed"
+          style={{ fontFamily: "'Nunito', sans-serif" }}
+        >
+          {active.text}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function InfoPanels({ panel, onClose }: { panel: InfoPanel; onClose: () => void }) {
+  if (!panel) return null
+
+  if (panel === 'authors') {
+    return (
+      <InfoModal
+        title="A Note from the Authors"
+        emoji="💌"
+        headerGradient="linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)"
+        onClose={onClose}
+      >
+        <AuthorsNoteContent />
+      </InfoModal>
+    )
+  }
+
+  return (
+    <InfoModal
+      title="Why This Book Matters"
+      emoji="📖"
+      headerGradient="linear-gradient(135deg, #F59E0B 0%, #D97706 100%)"
+      onClose={onClose}
+    >
+      <WhyBookMattersContent />
+    </InfoModal>
+  )
+}
+
 /* ─── Main App ───────────────────────────────────────────── */
 
 type Screen = 'cover' | 'book' | 'finale'
@@ -388,6 +715,7 @@ export default function App() {
   const [coverLeaving, setCoverLeaving] = useState(false)
   const [pageIndex, setPageIndex] = useState(0)
   const [flip, setFlip] = useState<FlipState>('idle')
+  const [infoPanel, setInfoPanel] = useState<InfoPanel>(null)
   const pendingPage = useRef(0)
 
   useEffect(() => {
@@ -558,6 +886,9 @@ export default function App() {
             👆 Tap Anywhere to Open the Manual! 📖
           </p>
         </div>
+
+        <InfoButtons onOpen={setInfoPanel} />
+        <InfoPanels panel={infoPanel} onClose={() => setInfoPanel(null)} />
       </div>
     )
   }
@@ -653,6 +984,9 @@ export default function App() {
             </KidButton>
           </div>
         </div>
+
+        <InfoButtons onOpen={setInfoPanel} />
+        <InfoPanels panel={infoPanel} onClose={() => setInfoPanel(null)} />
       </div>
     )
   }
@@ -878,6 +1212,9 @@ export default function App() {
           </KidButton>
         </div>
       </footer>
+
+      <InfoButtons onOpen={setInfoPanel} aboveFooter />
+      <InfoPanels panel={infoPanel} onClose={() => setInfoPanel(null)} />
     </div>
   )
 }
