@@ -48,31 +48,12 @@ interface Deco {
 
 const PAGES: PageData[] = [
   {
-    id: 'busy-hands',
-    title: 'Busy Hands!',
-    emoji: '🖐️',
-    accentColor: '#DC2626',
-    badgeColor: '#FEF2F2',
-    headerGradient: 'linear-gradient(135deg, #EF4444 0%, #B91C1C 100%)',
-    pageBackground: 'linear-gradient(160deg, #FEF2F2 0%, #FEE2E2 50%, #FFFBEB 100%)',
-    intro:
-      'Let\'s get our hands busy! Practice lacing, zipping, buckling, and fastening — just like getting ready for the day!',
-    steps: [
-      { emoji: '👟', text: 'Find the Busy Hands page with the red sneakers, yellow zipper, green buckle, and white Velcro strip!' },
-      { emoji: '🎀', text: 'Thread the white lace through the holes on the sneakers — try a criss-cross pattern!' },
-      { emoji: '🔒', text: 'Grip the yellow zipper tab and slide it smoothly up and down!' },
-      { emoji: '🔗', text: 'Push the black buckle together until it clicks — then squeeze the sides to release!' },
-      { emoji: '✨', text: 'Peel and press the white Velcro strip — feel the texture and celebrate your busy hands!' },
-    ],
-    video: busyHandsVideo,
-  },
-  {
     id: 'dinosaur-hatching',
     title: 'Dinosaur Hatching!',
     emoji: '🦖',
     accentColor: '#65A30D',
     badgeColor: '#F7FEE7',
-    headerGradient: 'linear-gradient(135deg, #84CC16 0%, #4D7C0F 100%)',
+    headerGradient: 'linear-gradient(135deg, #84CC16 0%,rgb(86, 93, 76) 100%)',
     pageBackground: 'linear-gradient(160deg, #F7FEE7 0%, #ECFCCB 50%, #FEF9C3 100%)',
     intro:
       'A baby dinosaur is hiding inside an egg! Let\'s crack the egg and help our new dino friend hatch!',
@@ -102,6 +83,25 @@ const PAGES: PageData[] = [
       { emoji: '✨', text: 'Smile big and see your sparkling clean teeth!' },
     ],
     video: toothbrushVideo,
+  },
+  {
+    id: 'busy-hands',
+    title: 'Busy Hands!',
+    emoji: '🖐️',
+    accentColor: '#DC2626',
+    badgeColor: '#FEF2F2',
+    headerGradient: 'linear-gradient(135deg, #EF4444 0%, #B91C1C 100%)',
+    pageBackground: 'linear-gradient(160deg, #FEF2F2 0%, #FEE2E2 50%, #FFFBEB 100%)',
+    intro:
+      'Let\'s get our hands busy! Practice lacing, zipping, buckling, and fastening — just like getting ready for the day!',
+    steps: [
+      { emoji: '👟', text: 'Find the Busy Hands page with the red sneakers, yellow zipper, green buckle, and white Velcro strip!' },
+      { emoji: '🎀', text: 'Thread the white lace through the holes on the sneakers — try a criss-cross pattern!' },
+      { emoji: '🔒', text: 'Grip the yellow zipper tab and slide it smoothly up and down!' },
+      { emoji: '🔗', text: 'Push the black buckle together until it clicks — then squeeze the sides to release!' },
+      { emoji: '✨', text: 'Peel and press the white Velcro strip — feel the texture and celebrate your busy hands!' },
+    ],
+    video: busyHandsVideo,
   },
   {
     id: 'im-a-boy',
